@@ -33,7 +33,7 @@ export type State ={
 
 const CreateInvoice = FormSchema.omit({ id: true, date:true })
 
-export async function createInvoice(prevState: State, formData: FormData){
+export async function createInvoice(prevState: State, formData: FormData):Promise<State>{
     const validatedFields = CreateInvoice.safeParse({
         customerId: formData.get('customerId'),
         amount: formData.get('amount'),
@@ -41,10 +41,11 @@ export async function createInvoice(prevState: State, formData: FormData){
     })
 
     if(!validatedFields.success){
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Missing fields. failed to create invoice'
-        }
+        // return {
+        //     errors: validatedFields.error.flatten().fieldErrors,
+        //     message: 'Missing fields. failed to create invoice'
+        // }
+        throw new Error('Validation failed')
     }
 
     const { customerId, amount, status } = CreateInvoice.parse({
@@ -62,9 +63,10 @@ export async function createInvoice(prevState: State, formData: FormData){
     `;     
     } catch (error) {
         console.error(error);
-        return {
-            message: 'Database Error: Failed to create invoices'
-        }
+        // return {
+        //     message: 'Database Error: Failed to create invoices'
+        // }
+         throw new Error('Database Error: Failed to create invoices')
     }
     
 
@@ -87,7 +89,8 @@ export async function updateInvoice(id: string, formData: FormData){
         UPDATE invoices set customer_id =${customerId}, amount = ${amountInCents}, status = ${status} WHERE id = ${id}`;
     } catch (error) {
         console.error(error);
-        return { message : 'Database Error : Failed to update invoice'}
+        // return { message : 'Database Error : Failed to update invoice'}
+        throw new Error('Database Error: Failed to update invoices')
     }
     
     revalidatePath('/dashboard/invoices')
@@ -99,7 +102,8 @@ export async function deleteInvoice(id: string){
         await sql `DELETE FROM invoices WHERE id =${id}`;        
     } catch (error) {
         console.error(error)
-        return { message : 'Database Error : Failed to delete data'}
+        throw new Error('Database Error: Failed to delete data')
+        // return { message : 'Database Error : Failed to delete data'}
     }
     revalidatePath('/dashboard/invoices')
 }
