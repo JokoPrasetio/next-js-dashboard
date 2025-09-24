@@ -34,9 +34,9 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
               <option value="" disabled>
                 Select a customer
               </option>
-              {customers.map((customer) => (
-                <option value={customer.id}>
-                  {customer.name}
+              {customers.map((customer, index) => (
+                <option key={index} value={customer?.id}>
+                  {customer?.name}
                 </option>
               ))}
             </select>
